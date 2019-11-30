@@ -18,9 +18,10 @@ class AsyncRunner2(private[this] val name: String, private[this] val canStart: (
         Thread.`yield`()
       }
       f(name)
-      isFinished = true
+      synchronized(isFinished = true)//readwritelock
     }).start()
   }
 
-  def canNextStart: () => Boolean = () => this.isFinished
+  def canNextStart: () => Boolean = () => synchronized(this.isFinished)
+  //checkthenact
 }
