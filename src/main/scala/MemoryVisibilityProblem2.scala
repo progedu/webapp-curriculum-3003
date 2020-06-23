@@ -21,6 +21,12 @@ class AsyncRunner2(private[this] val name: String, private[this] val canStart: (
       isFinished = true
     }).start()
   }
+  
+  def setIsFinished(value: Boolean) = synchronized {
+    isFinished = value
+  }
 
-  def canNextStart: () => Boolean = () => this.isFinished
+  def canNextStart: () => Boolean = () => synchronized {
+    this.isFinished
+  }
 }
