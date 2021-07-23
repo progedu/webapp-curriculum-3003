@@ -12,15 +12,22 @@ object MemoryVisibilityProblem2 extends App {
 class AsyncRunner2(private[this] val name: String, private[this] val canStart: () => Boolean) {
   private[this] var isFinished = false
 
+
   def asyncRun(f: String => Unit): Unit = {
     new Thread(() => {
       while (!canStart()) {
         Thread.`yield`()
       }
       f(name)
-      isFinished = true
+      setFinished
     }).start()
   }
 
-  def canNextStart: () => Boolean = () => this.isFinished
+  private[this] def setFinished: Unit = synchronized {
+    this.isFinished = true
+  }
+
+  def canNextStart: () => Boolean = () => synchronized {
+    this.isFinished
+  }
 }
